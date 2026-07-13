@@ -121,6 +121,9 @@ sudo docker run -d \
 ### အဆင့် (၆) - Web UI အတွက် Nginx Reverse Proxy (Port 8443) နှင့် SSL (HTTPS) တပ်ဆင်ခြင်း
 အခြားသော vpn (ဥပမာ- Outline) များသည် port 443 ကို အသုံးပြုထားတတ်သဖြင့် Web UI panel ကို Port 8443 ဖြင့် သီးသန့် reverse proxy လုပ်နည်း ဖြစ်သည်။
 
+> [!TIP]
+> အကယ်၍ သင့်ဆာဗာပေါ်တွင် Outline VPN က Port `8443` ကို ယူသုံးထားပြီးဖြစ်ပါက အောက်ပါ configurations နှင့် Firewall commands များတွင် `8443` နေရာ၌ လွတ်လပ်သော port တစ်ခု (ဥပမာ- **`9443`** သို့မဟုတ် `8444`) သို့ ပြောင်းလဲအစားထိုးအသုံးပြုပေးရပါမည်။
+
 ၁။ Nginx နှင့် Certbot သွင်းရန် -
 ```bash
 sudo apt update
