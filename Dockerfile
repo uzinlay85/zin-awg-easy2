@@ -30,6 +30,10 @@ COPY --from=build_tools /amneziawg-tools/src/wg /usr/bin/awg
 COPY --from=build_tools /amneziawg-tools/src/wg-quick/linux.bash /usr/bin/wg-quick
 COPY --from=build_tools /amneziawg-tools/src/wg-quick/linux.bash /usr/bin/awg-quick
 
+# Create symlink for AmneziaWG tools config path
+RUN mkdir -p /etc/amnezia && ln -sf /etc/wireguard /etc/amnezia/amneziawg
+
+
 COPY --from=build_node_modules /app /app
 COPY --from=build_node_modules /node_modules /node_modules
 COPY --from=build_node_modules /app/wgpw.sh /bin/wgpw
