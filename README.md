@@ -43,7 +43,7 @@ sudo systemctl enable --now docker
 ### အဆင့် (၂) - Firewall (UFW) ပေါက်များ ဖွင့်ခြင်း
 VPN နှင့် Web UI proxy အတွက် လိုအပ်သော ports များကို firewall တွင် ဖွင့်ပါ -
 ```bash
-sudo ufw allow 22/tcp
+sudo ufw allow <YOUR_SSH_PORT>/tcp   # မိမိအသုံးပြုနေသော SSH Port ကို ဖွင့်ပေးရန် (ပုံမှန် ၂၂ သို့မဟုတ် သီးသန့် port)
 sudo ufw allow 80/tcp
 sudo ufw allow 8443/tcp
 sudo ufw allow 58210/udp
