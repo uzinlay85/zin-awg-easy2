@@ -85,7 +85,6 @@ sudo docker run -d \
   -e WG_PORT=58210 \
   -e WG_MTU=1200 \
   -e WG_PERSISTENT_KEEPALIVE=25 \
-  # Legacy (AWG 1.0)
   -e JC=3 \
   -e JMIN=50 \
   -e JMAX=195 \
@@ -95,7 +94,6 @@ sudo docker run -d \
   -e H2=820269891 \
   -e H3=989884595 \
   -e H4=1838347724 \
-  # AWG 2.0 (CPS/Mimicry parameters - တရားဝင် DNS/QUIC mimicry ပုံစံ)
   -e I1='<b 0xc0><r 32><t>' \
   -e I2='<b 0x01><r 16>' \
   -e UI_ENABLE_SORT_CLIENTS=true \
