@@ -146,7 +146,7 @@ H1 = ${config.server.h1}
 H2 = ${config.server.h2}
 H3 = ${config.server.h3}
 H4 = ${config.server.h4}
-\`;
+`;
 
     const i1 = config.server.i1 !== undefined ? config.server.i1 : I1;
     const i2 = config.server.i2 !== undefined ? config.server.i2 : I2;
