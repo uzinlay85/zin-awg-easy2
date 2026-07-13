@@ -24,6 +24,17 @@
 > [!IMPORTANT]
 > **မစတင်မီ:** Cloudflare သို့မဟုတ် သင့် Domain provider panel တွင် Domain ကို သင့် VPS IP သို့ ညွှန်ပြထားပြီး **Proxy Status ကို DNS Only (မီးခိုးရောင် တိမ်တိုက်)** အဖြစ် ပြောင်းထားပါ။
 
+> [!NOTE]
+> **Port တိုက်ဆိုင်မှု ကြိုတင်စစ်ဆေးရန် (Pre-check Ports):**
+> မတပ်ဆင်မီ ကျွန်ုပ်တို့အသုံးပြုမည့် ports များအား အခြား service များက ယူသုံးထားခြင်း ရှိ/မရှိ အောက်ပါအတိုင်း ကြိုတင်စစ်ဆေးနိုင်ပါသည် -
+> ```bash
+> # VPN Port (58210/UDP) သုံးထားသလား စစ်ရန်
+> sudo ss -ulpn | grep :58210
+> 
+> # Web UI Proxy Port (8443/TCP) သုံးထားသလား စစ်ရန် (အကယ်၍ သုံးထားပါက အဆင့် ၆ ရှိ TIP အတိုင်း port ပြောင်းသုံးပါ)
+> sudo ss -tlpn | grep :8443
+> ```
+
 ### အဆင့် (၁) - NAT Module ဖွင့်ခြင်း နှင့် Docker သွင်းခြင်း
 Docker ၏ legacy iptables စနစ် အလုပ်လုပ်နိုင်ရန် NAT Module ကို ကြိုတင်ဖွင့်ပြီး Docker သွင်းပါ -
 ```bash
