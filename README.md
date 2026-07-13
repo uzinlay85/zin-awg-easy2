@@ -13,7 +13,7 @@
 - **Docker Source Compilation:** Base image ၏ dependency ဟောင်းများကြောင့် crash ဖြစ်ခြင်းမှ ကာကွယ်ရန် `amneziawg-go` နှင့် `amneziawg-tools` နောက်ဆုံးဗားရှင်းများကို Container အတွင်း source code မှ တိုက်ရိုက် compile လုပ်ထားခြင်း။
 - **Web UI Management:** VPN clients များကို Port 8443 (HTTPS) ဖြင့် လုံခြုံစွာ ဖန်တီးခြင်း၊ ဖျက်ခြင်း၊ ပိတ်ခြင်း/ဖွင့်ခြင်း ပြုလုပ်နိုင်ခြင်း။
 - **QR Code & Config Download:** Client များအတွက် ဆက်သွယ်ရန် configuration ဖိုင်နှင့် QR ကုဒ်များ တိုက်ရိုက်ထုတ်ပေးခြင်း။
-- **Traffic Stats:** တစ်ဦးချင်းစီ၏ အင်တာနက်အသုံးပြုမှု နှုန်းထားများကို စောင့်ကြည့်နိုင်ခြင်း။
+- **Traffic Stats:** One-time links, traffic usage charts နှင့် device list များ စောင့်ကြည့်နိုင်ခြင်း။
 
 ---
 
@@ -60,15 +60,19 @@ cd zin-awg-easy2
 sudo docker build -t amnezia-wg-easy:2.0 .
 ```
 
-### အဆင့် (၄) - Web UI အတွက် Password ကို Hash ပြောင်းခြင်း
-Web UI သို့ ဝင်ရောက်ရန် မိမိအသုံးပြုလိုသော Password ကို လုံခြုံစိတ်ချရသော Hash Code ပြောင်းရပါမည်။ `YOUR_PASSWORD` နေရာတွင် သင့်စကားဝှက်ကို ထည့်သွင်းပါ -
+### အဆင့် (၄) - Variables သတ်မှတ်ခြင်း နှင့် Password Hash Code ထုတ်ခြင်း
+တပ်ဆင်မှုကို ပိုမိုမြန်ဆန်လွယ်ကူစေရန်နှင့် domain/password ပြင်ရသည့် နေရာများကို လျှော့ချရန်အတွက် သင့် Domain နှင့် Password ကို Variable အဖြစ် သတ်မှတ်ပါ -
 ```bash
-sudo docker run -it amnezia-wg-easy:2.0 wgpw 'YOUR_PASSWORD'
+# ၁။ မိမိ၏ Domain နှင့် အသုံးပြုလိုသော Password ကို သတ်မှတ်ပါ
+export DOMAIN="vpn.yourdomain.com"
+export PASSWORD="YOUR_PASSWORD"
+
+# ၂။ Password ကို Hash Code အဖြစ် အလိုအလျောက် ပြောင်းလဲသတ်မှတ်ခြင်း
+export HASH=$(sudo docker run -i amnezia-wg-easy:2.0 wgpw "$PASSWORD" | cut -d"'" -f2)
 ```
-*ရလဒ်အနေဖြင့် ထွက်လာသော `$2b$12$...` သို့မဟုတ် `$2a$12$...` ဟု စတင်သည့် Hash Code ကို ကူးယူသိမ်းဆည်းထားပါ။*
 
 ### အဆင့် (၅) - Container ကို စတင် Run ခြင်း
-အောက်ပါ run command ကို ကူးယူပြီး `WG_HOST` နေရာတွင် သင့် domain နာမည်နှင့် `PASSWORD_HASH` နေရာတွင် အဆင့် (၄) မှ ရလာသော Hash Code ကို အစားထိုးထည့်သွင်း၍ run ပါ -
+အောက်ပါ command တစ်ခုလုံးကို ကူးယူပြီး copy-paste တိုက်ရိုက် run ပါ (Domain နှင့် Hash Code တို့ကို Variable များဖြင့် အလိုအလျောက် အစားထိုးသွားမည်ဖြစ်သည်) -
 
 > [!NOTE]
 > `I1` settings ထဲတွင် `<c>` (Packet Counter) tag အား ထည့်သွင်းပါက userspace go daemon မှ support မလုပ်သဖြင့် crash ဖြစ်စေနိုင်သောကြောင့် ဖယ်ရှားပြီး **`'<b 0xc0><r 32><t>'`** ကိုသာ အသုံးပြုထားပါသည်။
@@ -79,8 +83,8 @@ sudo rm -f ~/.amnezia-wg-easy/wg0.json ~/.amnezia-wg-easy/wg0.conf
 
 sudo docker run -d \
   --name=amnezia-wg-easy \
-  -e WG_HOST=vpn.yourdomain.com \
-  -e PASSWORD_HASH='$2a$12$...သင်၏_HASH_CODE' \
+  -e WG_HOST="$DOMAIN" \
+  -e PASSWORD_HASH="$HASH" \
   -e PORT=51831 \
   -e WG_PORT=58210 \
   -e WG_MTU=1200 \
@@ -123,19 +127,19 @@ sudo apt install nginx certbot python3-certbot-nginx -y
 
 ၂။ SSL Certificate တောင်းယူရန် (Nginx configurations မပြင်ဆင်မီ သီးသန့်တောင်းခြင်း) -
 ```bash
-sudo certbot certonly --nginx -d vpn.yourdomain.com
+sudo certbot certonly --nginx -d "$DOMAIN"
 ```
 
-၃။ Nginx Config ဖိုင်အသစ် ဖန်တီးရန် (သင့် Domain นာမည် အစားထိုးပါ) -
+၃။ Nginx Config ဖိုင်အသစ် ဖန်တီးရန် (Copy-Paste တိုက်ရိုက် run နိုင်ပါသည်) -
 ```bash
 sudo bash -c 'cat << "EOF" > /etc/nginx/sites-available/amnezia
 server {
     listen 8443 ssl;
     listen [::]:8443 ssl;
-    server_name vpn.yourdomain.com;
+    server_name '$DOMAIN';
     
-    ssl_certificate /etc/letsencrypt/live/vpn.yourdomain.com/fullchain.pem;
-    ssl_certificate_key /etc/letsencrypt/live/vpn.yourdomain.com/privkey.pem;
+    ssl_certificate /etc/letsencrypt/live/'$DOMAIN'/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/'$DOMAIN'/privkey.pem;
 
     location / {
         proxy_pass http://127.0.0.1:51831;
@@ -153,7 +157,7 @@ server {
 server {
     listen 80;
     listen [::]:80;
-    server_name vpn.yourdomain.com;
+    server_name '$DOMAIN';
     return 301 https://$host:8443$request_uri;
 }
 EOF'
@@ -166,7 +170,7 @@ sudo nginx -t
 sudo systemctl reload nginx
 ```
 
-အဆင့်အားလုံး ပြီးမြောက်ပါက Browser မှ **`https://vpn.yourdomain.com:8443`** ဟု ရိုက်ထည့်ပြီး Web UI Panel သို့ လုံခြုံစွာ ဝင်ရောက်နိုင်ပြီ ဖြစ်သည်။
+အဆင့်အားလုံး ပြီးမြောက်ပါက Browser မှ **`https://$DOMAIN:8443`** ဟု ရိုက်ထည့်ပြီး Web UI Panel သို့ လုံခြုံစွာ ဝင်ရောက်နိုင်ပြီ ဖြစ်သည်။
 
 ---
 
@@ -195,4 +199,3 @@ sudo ufw reload
 # ၄။ NAT Configuration ဖျက်ခြင်း
 sudo rm /etc/modules-load.d/iptable_nat.conf
 ```
-
