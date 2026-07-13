@@ -174,6 +174,24 @@ sudo systemctl reload nginx
 
 အဆင့်အားလုံး ပြီးမြောက်ပါက Browser မှ **`https://$DOMAIN:8443`** ဟု ရိုက်ထည့်ပြီး Web UI Panel သို့ လုံခြုံစွာ ဝင်ရောက်နိုင်ပြီ ဖြစ်သည်။
 
+### 💡 အပိုဆောင်း စွမ်းဆောင်ရည်မြှင့်တင်မှု (Internet Speed Optimization)
+အဝေးကွာဆုံး ဆာဗာများသို့ ချိတ်ဆက်ရာတွင် (ဥပမာ- မြန်မာနိုင်ငံမှ အမေရိကန်သို့) Internet Download Speed အား သိသာစွာ တိုးတက်ကောင်းမွန်လာစေရန် ဆာဗာတွင် **Google BBR Congestion Control** စနစ်အား အောက်ပါအတိုင်း ဖွင့်လှစ်ပေးပါ -
+
+```bash
+# ၁။ Google BBR နှင့် network buffers များအား sysctl တွင် ဖြည့်သွင်းခြင်း
+sudo bash -c 'cat << EOF >> /etc/sysctl.conf
+net.core.default_qdisc=fq
+net.ipv4.tcp_congestion_control=bbr
+net.ipv4.tcp_rmem=4096 87380 16777216
+net.ipv4.tcp_wmem=4096 65536 16777216
+net.core.rmem_max=16777216
+net.core.wmem_max=16777216
+EOF'
+
+# ၂။ ဆက်တင်များအား စတင်အသက်သွင်းခြင်း
+sudo sysctl -p
+```
+
 ---
 
 ## 🗑️ စနစ်ကို ပြန်လည်ဖျက်သိမ်းနည်း (Uninstall Guide)
