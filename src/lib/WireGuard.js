@@ -35,6 +35,11 @@ const {
   H2,
   H3,
   H4,
+  I1,
+  I2,
+  I3,
+  I4,
+  I5,
 } = require('../config');
 
 module.exports = class WireGuard {
@@ -72,6 +77,11 @@ module.exports = class WireGuard {
             h2: H2,
             h3: H3,
             h4: H4,
+            i1: I1,
+            i2: I2,
+            i3: I3,
+            i4: I4,
+            i5: I5,
           },
           clients: {},
         };
@@ -136,7 +146,19 @@ H1 = ${config.server.h1}
 H2 = ${config.server.h2}
 H3 = ${config.server.h3}
 H4 = ${config.server.h4}
-`;
+\`;
+
+    const i1 = config.server.i1 !== undefined ? config.server.i1 : I1;
+    const i2 = config.server.i2 !== undefined ? config.server.i2 : I2;
+    const i3 = config.server.i3 !== undefined ? config.server.i3 : I3;
+    const i4 = config.server.i4 !== undefined ? config.server.i4 : I4;
+    const i5 = config.server.i5 !== undefined ? config.server.i5 : I5;
+
+    if (i1) result += `I1 = ${i1}\n`;
+    if (i2) result += `I2 = ${i2}\n`;
+    if (i3) result += `I3 = ${i3}\n`;
+    if (i4) result += `I4 = ${i4}\n`;
+    if (i5) result += `I5 = ${i5}\n`;
 
     for (const [clientId, client] of Object.entries(config.clients)) {
       if (!client.enabled) continue;
@@ -254,7 +276,11 @@ H1 = ${config.server.h1}
 H2 = ${config.server.h2}
 H3 = ${config.server.h3}
 H4 = ${config.server.h4}
-
+${(config.server.i1 !== undefined ? config.server.i1 : I1) ? `I1 = ${config.server.i1 !== undefined ? config.server.i1 : I1}\n` : ''}\
+${(config.server.i2 !== undefined ? config.server.i2 : I2) ? `I2 = ${config.server.i2 !== undefined ? config.server.i2 : I2}\n` : ''}\
+${(config.server.i3 !== undefined ? config.server.i3 : I3) ? `I3 = ${config.server.i3 !== undefined ? config.server.i3 : I3}\n` : ''}\
+${(config.server.i4 !== undefined ? config.server.i4 : I4) ? `I4 = ${config.server.i4 !== undefined ? config.server.i4 : I4}\n` : ''}\
+${(config.server.i5 !== undefined ? config.server.i5 : I5) ? `I5 = ${config.server.i5 !== undefined ? config.server.i5 : I5}\n` : ''}
 [Peer]
 PublicKey = ${config.server.publicKey}
 ${client.preSharedKey ? `PresharedKey = ${client.preSharedKey}\n` : ''

@@ -60,3 +60,10 @@ module.exports.H1 = process.env.H1 || getRandomHeader();
 module.exports.H2 = process.env.H2 || getRandomHeader();
 module.exports.H3 = process.env.H3 || getRandomHeader();
 module.exports.H4 = process.env.H4 || getRandomHeader();
+
+module.exports.I1 = process.env.I1 || '<b 0xc0><r 32><c><t>';
+module.exports.I2 = process.env.I2 || '<b 0x01><r 16>';
+module.exports.I3 = process.env.I3 || '';
+module.exports.I4 = process.env.I4 || '';
+module.exports.I5 = process.env.I5 || '';
+
