@@ -87,11 +87,11 @@ sudo docker run -d \
   -e PASSWORD_HASH="$HASH" \
   -e PORT=51831 \
   -e WG_PORT=58210 \
-  -e WG_MTU=1320 \
+  -e WG_MTU=1200 \
   -e WG_PERSISTENT_KEEPALIVE=25 \
-  -e JC=7 \
-  -e JMIN=78 \
-  -e JMAX=200 \
+  -e JC=3 \
+  -e JMIN=50 \
+  -e JMAX=195 \
   -e S1=72 \
   -e S2=56 \
   -e S3=16 \
