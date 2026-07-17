@@ -1,41 +1,79 @@
 #!/bin/bash
 
 # ==============================================================================
-# Configuration Section (You only need to edit this ONCE)
+# AmneziaWG 2.0 Web UI Automation Script
 # ==============================================================================
-DOMAIN="vpn.yourdomain.com"
-PASSWORD="YOUR_PASSWORD"
+ENV_FILE="config.env"
 
-# ==============================================================================
-# Automation Script (Do not edit below unless you know what you are doing)
-# ==============================================================================
 echo "--------------------------------------------------"
 echo "Starting AmneziaWG 2.0 Web UI Automation Script"
 echo "--------------------------------------------------"
 
-echo "[1/4] Generating Password Hash..."
-HASH=$(sudo docker run -i amnezia-wg-easy:2.0 wgpw "$PASSWORD" | cut -d"'" -f2)
-
-if [ -z "$HASH" ]; then
-    echo "ERROR: Failed to generate password hash. Make sure amnezia-wg-easy:2.0 image is built."
-    exit 1
+# Step 1: Check if config.env exists. If not, try to extract from running container
+if [ ! -f "$ENV_FILE" ]; then
+    echo "No $ENV_FILE found. Checking if there is an active container to restore config..."
+    if sudo docker ps --format '{{.Names}}' | grep -q '^amnezia-wg-easy$'; then
+        echo "Found running amnezia-wg-easy container! Extracting parameters..."
+        DOMAIN=$(sudo docker inspect amnezia-wg-easy --format='{{range .Config.Env}}{{println .}}{{end}}' | grep '^WG_HOST=' | cut -d= -f2)
+        HASH=$(sudo docker inspect amnezia-wg-easy --format='{{range .Config.Env}}{{println .}}{{end}}' | grep '^PASSWORD_HASH=' | cut -d= -f2)
+        
+        if [ -n "$DOMAIN" ] && [ -n "$HASH" ]; then
+            cat << EOF > "$ENV_FILE"
+WG_HOST=$DOMAIN
+PASSWORD_HASH=$HASH
+PORT=51831
+WG_PORT=58210
+UI_ENABLE_SORT_CLIENTS=true
+UI_TRAFFIC_STATS=true
+WG_ENABLE_EXPIRES_TIME=true
+WG_ENABLE_ONE_TIME_LINKS=true
+EOF
+            echo "Successfully restored settings and created $ENV_FILE."
+        fi
+    fi
 fi
 
-echo "[2/4] Stopping old container if running..."
+# Step 2: If config.env still doesn't exist, ask the user for domain and password
+if [ ! -f "$ENV_FILE" ]; then
+    echo "$ENV_FILE not found and no active container detected."
+    read -p "Enter your VPN Domain (e.g., vpn.yourdomain.com): " DOMAIN
+    read -s -p "Enter your VPN Admin Password: " PASSWORD
+    echo ""
+    
+    echo "Generating Password Hash..."
+    HASH=$(sudo docker run -i amnezia-wg-easy:2.0 wgpw "$PASSWORD" | cut -d"'" -f2)
+    
+    if [ -z "$HASH" ]; then
+        echo "ERROR: Failed to generate password hash. Make sure amnezia-wg-easy:2.0 image is built."
+        exit 1
+    fi
+    
+    cat << EOF > "$ENV_FILE"
+WG_HOST=$DOMAIN
+PASSWORD_HASH=$HASH
+PORT=51831
+WG_PORT=58210
+UI_ENABLE_SORT_CLIENTS=true
+UI_TRAFFIC_STATS=true
+WG_ENABLE_EXPIRES_TIME=true
+WG_ENABLE_ONE_TIME_LINKS=true
+EOF
+    echo "Created new $ENV_FILE file."
+fi
+
+# Load the variables
+source "$ENV_FILE"
+
+echo "Domain: $WG_HOST"
+
+echo "Stopping old container if running..."
 sudo docker stop amnezia-wg-easy 2>/dev/null || true
 sudo docker rm amnezia-wg-easy 2>/dev/null || true
 
-echo "[3/4] Starting new container..."
+echo "Starting container with $ENV_FILE..."
 sudo docker run -d \
   --name=amnezia-wg-easy \
-  -e WG_HOST="$DOMAIN" \
-  -e PASSWORD_HASH="$HASH" \
-  -e PORT=51831 \
-  -e WG_PORT=58210 \
-  -e UI_ENABLE_SORT_CLIENTS=true \
-  -e UI_TRAFFIC_STATS=true \
-  -e WG_ENABLE_EXPIRES_TIME=true \
-  -e WG_ENABLE_ONE_TIME_LINKS=true \
+  --env-file "$ENV_FILE" \
   -v /home/zinko/.amnezia-wg-easy:/etc/wireguard \
   -p 58210:58210/udp \
   -p 127.0.0.1:51831:51831/tcp \
@@ -47,6 +85,6 @@ sudo docker run -d \
   --restart=unless-stopped \
   amnezia-wg-easy:2.0
 
-echo "[4/4] Done! amnezia-wg-easy container has been started."
+echo "Done! amnezia-wg-easy container is now running."
 echo "--------------------------------------------------"
 sudo docker ps | grep amnezia-wg-easy

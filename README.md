@@ -208,20 +208,16 @@ sudo docker build -t amnezia-wg-easy:2.0 .
 ```
 
 ### အဆင့် (၂) - `start.sh` ကို အသုံးပြု၍ UI Features များနှင့်အတူ Container ကို ပြန်လည်စတင်ခြင်း
-ကျွန်ုပ်တို့ ထည့်သွင်းပေးထားသော `start.sh` script ကို အသုံးပြု၍ variables များကို တစ်ကြိမ်တည်းသတ်မှတ်ပြီး လွယ်ကူစွာ run နိုင်ပါသည် -
+ကျွန်ုပ်တို့ ထည့်သွင်းပေးထားသော `start.sh` script သည် လက်ရှိ run နေသော container ထဲမှ Domain နှင့် Password Hash တန်ဖိုးများကို အလိုအလျောက် ဆွဲယူဖတ်ရှုပေးမည်ဖြစ်သောကြောင့် variable များ ထပ်မံပြင်ဆင်ပေးရန် မလိုတော့ပါ။
 
-1. `start.sh` ဖိုင်ကို ဖွင့်ပါ -
-   ```bash
-   nano start.sh
-   ```
-2. အပေါ်ဆုံးရှိ စာကြောင်းနှစ်ခုတွင် သင့်တန်ဖိုးများ အစားထိုးထည့်သွင်းပေးပါ -
-   - `DOMAIN="vpn.yourdomain.com"` (သင့် vpn domain သို့ ပြောင်းပါ)
-   - `PASSWORD="YOUR_PASSWORD"` (သင့် panel password သို့ ပြောင်းပါ)
-3. Script ကို run ခွင့်ပေးပြီး စတင် run ပါ -
-   ```bash
-   chmod +x start.sh
-   ./start.sh
-   ```
+၁။ Script ကို run ခွင့်ပေးပြီး စတင် run ပါ -
+```bash
+chmod +x start.sh
+./start.sh
+```
+
+*(မှတ်ချက် - အကယ်၍ ၎င်းသည် ပထမဆုံးအကြိမ် setup ဖြစ်ပြီး အစကတည်းက စတင်တင်ခြင်းဖြစ်ပါက script က သင့်အား Domain နှင့် Password တောင်းယူပြီး `config.env` ဖိုင်အဖြစ် အလိုအလျောက် သီးသန့်သိမ်းဆည်းပေးသွားမည် ဖြစ်သည်)*
+
 
 ### 💡 (အရေးကြီးအကြံပြုချက်) လက်ရှိရှိပြီးသား Client များအတွက် Obfuscation သစ်များ ပြောင်းလဲခြင်း
 အကယ်၍ သင့်ဆာဗာပေါ်တွင် client configurations အဟောင်းများ ရှိနှင့်ပြီးသားဖြစ်ပါက ၎င်းတို့အား AmneziaWG 2.0 ၏ range-based headers များနှင့် QUIC signatures သစ်များသို့ update ဖြစ်စေရန် ဆာဗာရှိ `wg0.json` ဖိုင်ကို အောက်ပါအတိုင်း ပြင်ဆင်ရန် လိုအပ်သည် -
