@@ -205,6 +205,61 @@ EOF'
 # ၂။ ဆက်တင်များအား စတင်အသက်သွင်းခြင်း
 sudo sysctl -p
 ```
+---
+
+## 🔄 စနစ်ကို Update ပြုလုပ်နည်း (Update Guide)
+
+စနစ်ကို update ပြုလုပ်ရာတွင် လက်ရှိဖန်တီးထားသော client configurations (ဒေတာများ) မပျက်စီးစေဘဲ နောက်ဆုံးထွက် ကုဒ်များနှင့် default parameters များကို အလွယ်တကူ update လုပ်ရန် အောက်ပါအတိုင်း လုပ်ဆောင်ပါ -
+
+### အဆင့် (၁) - Source Code ကို Update ပြုလုပ်ပြီး Docker Image Build ဆွဲခြင်း
+```bash
+cd zin-awg-easy2
+git pull
+
+# Docker Image ကို Build ပြန်ဆွဲခြင်း
+sudo docker build -t amnezia-wg-easy:2.0 .
+```
+
+### အဆင့် (၂) - `start.sh` ကို အသုံးပြု၍ UI Features များနှင့်အတူ Container ကို ပြန်လည်စတင်ခြင်း
+ကျွန်ုပ်တို့ ထည့်သွင်းပေးထားသော `start.sh` script ကို အသုံးပြု၍ variables များကို တစ်ကြိမ်တည်းသတ်မှတ်ပြီး လွယ်ကူစွာ run နိုင်ပါသည် -
+
+1. `start.sh` ဖိုင်ကို ဖွင့်ပါ -
+   ```bash
+   nano start.sh
+   ```
+2. အပေါ်ဆုံးရှိ စာကြောင်းနှစ်ခုတွင် သင့်တန်ဖိုးများ အစားထိုးထည့်သွင်းပေးပါ -
+   - `DOMAIN="vpn.yourdomain.com"` (သင့် vpn domain သို့ ပြောင်းပါ)
+   - `PASSWORD="YOUR_PASSWORD"` (သင့် panel password သို့ ပြောင်းပါ)
+3. Script ကို run ခွင့်ပေးပြီး စတင် run ပါ -
+   ```bash
+   chmod +x start.sh
+   ./start.sh
+   ```
+
+### 💡 (အရေးကြီးအကြံပြုချက်) လက်ရှိရှိပြီးသား Client များအတွက် Obfuscation သစ်များ ပြောင်းလဲခြင်း
+အကယ်၍ သင့်ဆာဗာပေါ်တွင် client configurations အဟောင်းများ ရှိနှင့်ပြီးသားဖြစ်ပါက ၎င်းတို့အား AmneziaWG 2.0 ၏ range-based headers များနှင့် QUIC signatures သစ်များသို့ update ဖြစ်စေရန် ဆာဗာရှိ `wg0.json` ဖိုင်ကို အောက်ပါအတိုင်း ပြင်ဆင်ရန် လိုအပ်သည် -
+
+1. `wg0.json` ဖိုင်ကို ဖွင့်ပါ -
+   ```bash
+   # (မှတ်ချက်- find / -name "wg0.json" 2>/dev/null ဖြင့် သင့်ဖိုင်၏ တည်နေရာအမှန်ကို ရှာဖွေနိုင်ပါသည်)
+   nano ~/.amnezia-wg-easy/wg0.json  # သို့မဟုတ် /home/<user>/.amnezia-wg-easy/wg0.json
+   ```
+2. `server` block အောက်ရှိ တန်ဖိုးများကို range-based values နှင့် signatures များအဖြစ် အောက်ပါအတိုင်း အစားထိုးပြင်ဆင်ပေးပါ -
+   ```json
+       "h1": "100500-100600",
+       "h2": "100000500-100000600",
+       "h3": "200000500-200000502",
+       "h4": "300000500-400000500",
+       "i1": "<b 0xc700000001><rc 8><t><r 100>",
+       "i2": "<b 0xf6ab3267fa><t><rc 20><r 80>",
+       "i3": "",
+       "i4": "",
+       "i5": ""
+   ```
+3. ဖိုင်ကို save လုပ်ပြီးနောက် container ကို restart ပေးလိုက်ပါ -
+   ```bash
+   sudo docker restart amnezia-wg-easy
+   ```
 
 ---
 
