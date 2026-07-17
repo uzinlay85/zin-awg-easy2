@@ -64,17 +64,68 @@ fi
 # Load the variables
 source "$ENV_FILE"
 
+# Step 3: Automatic wg0.json migration (DPI Bypass range and signature updates)
+echo "Checking for wg0.json configuration file to auto-update..."
+WG_JSON_PATH=$(find /home /root -name "wg0.json" 2>/dev/null | head -n 1)
+
+if [ -n "$WG_JSON_PATH" ] && [ -f "$WG_JSON_PATH" ]; then
+    echo "Found wg0.json at: $WG_JSON_PATH"
+    
+    # Run inline Node.js migration script
+    node -e '
+const fs = require("fs");
+const filePath = process.argv[1];
+try {
+  const data = JSON.parse(fs.readFileSync(filePath, "utf8"));
+  if (data && data.server) {
+    const h1 = String(data.server.h1 || "");
+    // If h1 is not a range (i.e. does not contain "-"), we need to migrate it to AWG 2.0 ranges and QUIC signatures
+    if (!h1.includes("-")) {
+      console.log("Migrating wg0.json to new range-based headers and QUIC signatures...");
+      data.server.h1 = "100500-100600";
+      data.server.h2 = "100000500-100000600";
+      data.server.h3 = "200000500-200000502";
+      data.server.h4 = "300000500-400000500";
+      data.server.i1 = "<b 0xc700000001><rc 8><t><r 100>";
+      data.server.i2 = "<b 0xf6ab3267fa><t><rc 20><r 80>";
+      data.server.i3 = "";
+      data.server.i4 = "";
+      data.server.i5 = "";
+      fs.writeFileSync(filePath, JSON.stringify(data, null, 2), "utf8");
+      console.log("[SUCCESS] wg0.json configuration updated.");
+    } else {
+      console.log("wg0.json is already using range-based headers. No migration needed.");
+    }
+  }
+} catch (err) {
+  console.error("[ERROR] Failed to parse or update wg0.json:", err.message);
+}
+' "$WG_JSON_PATH"
+else
+    echo "No wg0.json found yet. (This is normal for fresh installations)."
+fi
+
 echo "Domain: $WG_HOST"
 
 echo "Stopping old container if running..."
 sudo docker stop amnezia-wg-easy 2>/dev/null || true
 sudo docker rm amnezia-wg-easy 2>/dev/null || true
 
-echo "Starting container with $ENV_FILE..."
+# Determine volume source directory dynamically
+VOL_DIR=$(dirname "$WG_JSON_PATH")
+if [ -z "$VOL_DIR" ] || [ ! -d "$VOL_DIR" ]; then
+    # Fallback to default if no wg0.json was found
+    VOL_DIR="/home/zinko/.amnezia-wg-easy"
+    if [ ! -d "/home/zinko" ]; then
+        VOL_DIR="/root/.amnezia-wg-easy"
+    fi
+fi
+
+echo "Starting container with volume mapping: $VOL_DIR -> /etc/wireguard"
 sudo docker run -d \
   --name=amnezia-wg-easy \
   --env-file "$ENV_FILE" \
-  -v /home/zinko/.amnezia-wg-easy:/etc/wireguard \
+  -v "$VOL_DIR:/etc/wireguard" \
   -p 58210:58210/udp \
   -p 127.0.0.1:51831:51831/tcp \
   --cap-add=NET_ADMIN \
