@@ -79,8 +79,9 @@ try {
   const data = JSON.parse(fs.readFileSync(filePath, "utf8"));
   if (data && data.server) {
     const h1 = String(data.server.h1 || "");
-    // If h1 is not a range (i.e. does not contain "-"), we need to migrate it to AWG 2.0 ranges and QUIC signatures
-    if (!h1.includes("-")) {
+    const i1 = String(data.server.i1 || "");
+    // Migrate if h1 is not a range, or if i1 contains the old TLS ClientHello signature (0x160301)
+    if (!h1.includes("-") || i1.includes("0x160301")) {
       console.log("Migrating wg0.json to new range-based headers and QUIC signatures...");
       data.server.h1 = "100500-100600";
       data.server.h2 = "100000500-100000600";
