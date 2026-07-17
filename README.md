@@ -247,7 +247,25 @@ chmod +x start.sh
 ---
 
 ## 🗑️ စနစ်ကို ပြန်လည်ဖျက်သိမ်းနည်း (Uninstall Guide)
-ဆာဗာပေါ်မှ ဤစနစ်ကို စနစ်တကျ သန့်ရှင်းစွာ ဖြုတ်လိုပါက အောက်ပါအတိုင်း အဆင့်ဆင့် လုပ်ဆောင်ပါ -
+
+> [!WARNING]
+> **ဆာဗာပေါ်တွင် အခြားဝန်ဆောင်မှုများ (ဥပမာ- x-ui, vless) ရှိနေပါက ဖတ်ရန်:**
+> အကယ်၍ သင့်ဆာဗာပေါ်တွင် x-ui (vless) သို့မဟုတ် အခြား websites များ လည်ပတ်နေပြီး SSL Certificate သို့မဟုတ် Nginx ကို ပူးတွဲသုံးစွဲနေပါက **Option A (Safe Uninstall)** ကိုသာ သုံးပါ။ Option B ကို သုံးပါက အခြားဝန်ဆောင်မှုများ၏ SSL ပျက်စီးသွားပြီး အလုပ်မလုပ်တော့ဘဲ ဖြစ်သွားနိုင်ပါသည်။
+
+### Option A: Safe Uninstall (အခြား x-ui/vless ဝန်ဆောင်မှုများကို မထိခိုက်စေဘဲ ဖျက်နည်း)
+ဤနည်းလမ်းသည် Nginx configuration များနှင့် shared SSL certificates များကို မထိခိုက်စေဘဲ VPN container နှင့် files များကိုသာ သန့်ရှင်းစွာ ဖျက်ပစ်ပါမည် -
+
+```bash
+# Docker Container နှင့် Config files များကိုသာ သီးသန့်ဖျက်ခြင်း
+sudo docker stop amnezia-wg-easy
+sudo docker rm amnezia-wg-easy
+sudo docker rmi amnezia-wg-easy:2.0
+sudo rm -rf ~/.amnezia-wg-easy
+sudo rm -f ./config.env
+```
+
+### Option B: Full Uninstall (ဆာဗာတစ်ခုလုံးမှ လုံးဝ ဥဿုံ ဖျက်သိမ်းနည်း)
+ဆာဗာတွင် ဤ VPN တစ်ခုတည်းကိုသာ သီးသန့်သုံးထားပြီး အရာအားလုံးကို အပြီးတိုင် ဖျက်ထုတ်လိုပါက အောက်ပါအတိုင်း လုပ်ဆောင်ပါ -
 
 ```bash
 # ၁။ Docker Container နှင့် Image များ ဖျက်ခြင်း
@@ -255,6 +273,7 @@ sudo docker stop amnezia-wg-easy
 sudo docker rm amnezia-wg-easy
 sudo docker rmi amnezia-wg-easy:2.0
 sudo rm -rf ~/.amnezia-wg-easy
+sudo rm -f ./config.env
 
 # ၂။ SSL နှင့် Nginx configurations များ ဖျက်ခြင်း
 sudo certbot delete --cert-name vpn.yourdomain.com
