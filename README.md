@@ -212,9 +212,11 @@ sudo docker build -t amnezia-wg-easy:2.0 .
 
 ၁။ Script ကို run ခွင့်ပေးပြီး စတင် run ပါ -
 ```bash
+cd zin-awg-easy2
 chmod +x start.sh
 ./start.sh
 ```
+
 
 *(မှတ်ချက် - အကယ်၍ ၎င်းသည် ပထမဆုံးအကြိမ် setup ဖြစ်ပြီး အစကတည်းက စတင်တင်ခြင်းဖြစ်ပါက script က သင့်အား Domain နှင့် Password တောင်းယူပြီး `config.env` ဖိုင်အဖြစ် အလိုအလျောက် သီးသန့်သိမ်းဆည်းပေးသွားမည် ဖြစ်သည်)*
 
