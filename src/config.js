@@ -49,7 +49,10 @@ module.exports.USE_GRAVATAR = process.env.USE_GRAVATAR || false;
 
 const getRandomInt = (min, max) => min + Math.floor(Math.random() * (max - min));
 const getRandomJunkSize = () => getRandomInt(15, 150);
-const getRandomHeader = () => getRandomInt(1, 2_147_483_647);
+const getRandomHeaderRange = (min, max, rangeSize) => {
+  const start = getRandomInt(min, max - rangeSize);
+  return `${start}-${start + rangeSize}`;
+};
 
 module.exports.JC = process.env.JC || getRandomInt(3, 10);
 module.exports.JMIN = process.env.JMIN || 50;
@@ -58,14 +61,15 @@ module.exports.S1 = process.env.S1 || getRandomJunkSize();
 module.exports.S2 = process.env.S2 || getRandomJunkSize();
 module.exports.S3 = process.env.S3 || 16;
 module.exports.S4 = process.env.S4 || 18;
-module.exports.H1 = process.env.H1 || getRandomHeader();
-module.exports.H2 = process.env.H2 || getRandomHeader();
-module.exports.H3 = process.env.H3 || getRandomHeader();
-module.exports.H4 = process.env.H4 || getRandomHeader();
+module.exports.H1 = process.env.H1 || getRandomHeaderRange(1, 100_000_000, 100);
+module.exports.H2 = process.env.H2 || getRandomHeaderRange(100_000_001, 200_000_000, 100);
+module.exports.H3 = process.env.H3 || getRandomHeaderRange(200_000_001, 300_000_000, 2);
+module.exports.H4 = process.env.H4 || getRandomHeaderRange(300_000_001, 2_000_000_000, 100_000_000);
 
-module.exports.I1 = process.env.I1 || '<b 0xc0><r 32><t>';
-module.exports.I2 = process.env.I2 || '<b 0x01><r 16>';
+module.exports.I1 = process.env.I1 || '<b 0xc700000001><rc 8><t><r 100>';
+module.exports.I2 = process.env.I2 || '<b 0xf6ab3267fa><t><rc 20><r 80>';
 module.exports.I3 = process.env.I3 || '';
 module.exports.I4 = process.env.I4 || '';
 module.exports.I5 = process.env.I5 || '';
+
 
