@@ -317,3 +317,37 @@ sudo systemctl restart docker
 
 ကျွန်ုပ်တို့၏ နောက်ဆုံးဗားရှင်းတွင် ဤတန်ဖိုးနှစ်ခုလုံးကို `1200` နှင့် `25` အဖြစ် Default သတ်မှတ်ပေးထားပြီးဖြစ်သောကြောင့် `start.sh` ဖြင့် update လုပ်လိုက်ရုံဖြင့် အလိုအလျောက် သက်ရောက်သွားမည် ဖြစ်သည်။
 
+---
+
+## 📊 ဆာဗာ၏ အင်တာနက် အဝင်အထွက် စစ်ဆေးခြင်း (Server Network Monitoring & Speed Test)
+
+ဆာဗာ၏ ကွန်ရက်အမြန်နှုန်းနှင့် bandwidth ကို စောင့်ကြည့်ရန် အောက်ပါ tools များကို အသုံးပြုနိုင်ပါသည် -
+
+### ၁။ ဆာဗာ၏ အင်တာနက်အမြန်နှုန်း (Speed Test) ကို တိုင်းတာခြင်း
+```bash
+# speedtest testing tool ကို သွင်းပါ
+sudo apt install speedtest-cli -y
+
+# Speedtest စမ်းသပ်ခြင်းကို စတင်ပါ
+speedtest-cli
+```
+
+### ၂။ ဆာဗာ၏ အဝင်အထွက် Traffic (Bandwidth) အား Real-time တိုက်ရိုက်ကြည့်ရှုခြင်း
+```bash
+# nload network monitor ကို သွင်းပါ
+sudo apt install nload -y
+
+# real-time စောင့်ကြည့်စနစ်ကို ဖွင့်ပါ (ထွက်လိုပါက keyboard မှ q ကို နှိပ်ပါ)
+nload
+```
+
+### ၃။ ဆာဗာသို့ မည်သည့် IP များက ချိတ်ဆက်ပြီး အင်တာနက် သုံးနေသလဲ စောင့်ကြည့်ခြင်း
+```bash
+# iftop ကို သွင်းပါ
+sudo apt install iftop -y
+
+# တိုက်ရိုက် စောင့်ကြည့်ပါ (ထွက်လိုပါက keyboard မှ q ကို နှိပ်ပါ)
+sudo iftop
+```
+
+
