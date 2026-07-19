@@ -292,3 +292,28 @@ sudo ufw reload
 # ၄။ NAT Configuration ဖျက်ခြင်း
 sudo rm /etc/modules-load.d/iptable_nat.conf
 ```
+
+---
+
+## 🛠️ အဖြစ်များသော ပြဿနာများနှင့် ဖြေရှင်းနည်းများ (Troubleshooting Guide)
+
+### ၁။ `Could not resolve host: github.com` သို့မဟုတ် Docker Build DNS Timeout ဖြစ်ခြင်း
+တပ်ဆင်စဉ် (သို့မဟုတ်) Update လုပ်စဉ်အတွင်း အင်တာနက်လိပ်စာ ရှာမတွေ့သည့် DNS Error တက်လာပါက (အချို့ VPS Provider များတွင် systemd-resolved DNS stub တုံ့ပြန်မှု နှေးကွေးခြင်း/မရှိခြင်းကြောင့် ဖြစ်တတ်သည်) အောက်ပါအတိုင်း DNS ကို Static ပြောင်းလဲပြီး ဖြေရှင်းနိုင်ပါသည် -
+
+```bash
+# DNS ကို Cloudflare (1.1.1.1) သို့ အမြဲတမ်း ပွင့်စေရန် ပြောင်းလဲသတ်မှတ်ခြင်း
+sudo rm -f /etc/resolv.conf
+echo "nameserver 1.1.1.1" | sudo tee /etc/resolv.conf
+
+# Docker သို့ ပြောင်းလဲမှု သက်ရောက်စေရန် Docker Service အား Restart ချခြင်း
+sudo systemctl restart docker
+```
+၎င်းနောက် `git pull` နှင့် `sudo docker build -t amnezia-wg-easy:2.0 .` တို့ကို ပြန်လည်လုပ်ဆောင်နိုင်ပါသည်။
+
+### ၂။ ချိတ်ဆက်မှု မကြာခဏ ပြတ်တောက်ခြင်း (Intermittent Disconnection)
+အကယ်၍ VPN ချိတ်ဆက်ပြီးနောက် စက္ကန့် ၃၀ မှ ၆၀ အတွင်း လိုင်းပြတ်တောက်သွားခြင်း (သို့မဟုတ်) ချိတ်လိုက်ပြုတ်လိုက် ဖြစ်နေပါက အောက်ပါအချက်များကို စစ်ဆေးပါ -
+* **MTU Size ပြဿနာ:** မိုဘိုင်းဖုန်းလိုင်းများအတွက် default MTU size ကြီးလွန်းပါက လိုင်းပြုတ်တတ်သည်။ လက်ရှိ Default `MTU = 1200` ကို အသုံးပြုထားရန် လိုအပ်သည်။
+* **PersistentKeepalive မရှိခြင်း:** NAT firewall များအောက်တွင် port ပိတ်မသွားစေရန် `PersistentKeepalive = 25` သတ်မှတ်ထားရမည်။
+
+ကျွန်ုပ်တို့၏ နောက်ဆုံးဗားရှင်းတွင် ဤတန်ဖိုးနှစ်ခုလုံးကို `1200` နှင့် `25` အဖြစ် Default သတ်မှတ်ပေးထားပြီးဖြစ်သောကြောင့် `start.sh` ဖြင့် update လုပ်လိုက်ရုံဖြင့် အလိုအလျောက် သက်ရောက်သွားမည် ဖြစ်သည်။
+
