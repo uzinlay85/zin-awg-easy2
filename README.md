@@ -44,8 +44,8 @@ sudo modprobe iptable_nat
 # ၂။ Reboot တက်တိုင်း အလိုအလျောက် ပွင့်နေစေရန် save လုပ်ရန်
 echo "iptable_nat" | sudo tee /etc/modules-load.d/iptable_nat.conf
 
-# ၃။ Docker သွင်းရန်
-curl -fsSL https://get.docker.com | sudo bash
+# ၃။ Docker နှင့် Git သွင်းရန် (curl error သို့မဟုတ် connection timeout ဖြစ်ပါက Troubleshooting အပိုင်း ၃ ကို ကြည့်ပါ)
+curl -fsSL https://get.docker.com | sudo bash || (sudo apt update && sudo apt install -y docker.io git)
 
 # ၄။ Docker Service ကို အမြဲတမ်း run ထားရန် ဖွင့်ခြင်း
 sudo systemctl enable --now docker
@@ -316,6 +316,23 @@ sudo systemctl restart docker
 * **PersistentKeepalive မရှိခြင်း:** NAT firewall များအောက်တွင် port ပိတ်မသွားစေရန် `PersistentKeepalive = 25` သတ်မှတ်ထားရမည်။
 
 ကျွန်ုပ်တို့၏ နောက်ဆုံးဗားရှင်းတွင် ဤတန်ဖိုးနှစ်ခုလုံးကို `1200` နှင့် `25` အဖြစ် Default သတ်မှတ်ပေးထားပြီးဖြစ်သောကြောင့် `start.sh` ဖြင့် update လုပ်လိုက်ရုံဖြင့် အလိုအလျောက် သက်ရောက်သွားမည် ဖြစ်သည်။
+
+### ၃။ Docker သွင်းစဉ် 'download.docker.com Connection timed out' သို့မဟုတ် 'Unit file docker.service does not exist' ဖြစ်ခြင်း
+`curl -fsSL https://get.docker.com | sudo bash` ဖြင့် Docker သွင်းစဉ် တရားဝင် Docker repository မှ download ချိတ်ဆက်မှု timeout ဖြစ်သွားပါက (အချို့ VPS များတွင် Docker CDN သို့မဟုတ် DNS ကြောင့် ဖြစ်တတ်သည်) Ubuntu ၏ တရားဝင် repository မှ native `docker.io` ကို အောက်ပါအတိုင်း တိုက်ရိုက်သွင်းနိုင်ပါသည် -
+
+```bash
+# DNS ကို Static ပြောင်းလဲခြင်း
+sudo rm -f /etc/resolv.conf
+echo "nameserver 1.1.1.1" | sudo tee /etc/resolv.conf
+echo "nameserver 8.8.8.8" | sudo tee -a /etc/resolv.conf
+
+# Ubuntu native docker.io နှင့် git ကို သွင်းခြင်း
+sudo apt update
+sudo apt install -y docker.io git
+
+# Docker service ကို စတင်လည်ပတ်စေခြင်း
+sudo systemctl enable --now docker
+```
 
 ---
 
