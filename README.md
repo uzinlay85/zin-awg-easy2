@@ -68,7 +68,7 @@ git clone https://github.com/uzinlay85/zin-awg-easy2.git
 cd zin-awg-easy2
 
 # Image build ဆွဲခြင်း (၃ မိနစ်ခန့် ကြာနိုင်ပါသည်)
-sudo docker build -t amnezia-wg-easy:2.0 .
+sudo docker build --network=host -t amnezia-wg-easy:2.0 .
 ```
 
 ### အဆင့် (၄) - Variables သတ်မှတ်ခြင်း နှင့် Password Hash Code ထုတ်ခြင်း
@@ -204,7 +204,7 @@ cd zin-awg-easy2
 git pull
 
 # Docker Image ကို Build ပြန်ဆွဲခြင်း
-sudo docker build -t amnezia-wg-easy:2.0 .
+sudo docker build --network=host -t amnezia-wg-easy:2.0 .
 ```
 
 ### အဆင့် (၂) - `start.sh` ကို အသုံးပြု၍ UI Features များနှင့်အတူ Container ကို ပြန်လည်စတင်ခြင်း
@@ -308,7 +308,7 @@ echo "nameserver 1.1.1.1" | sudo tee /etc/resolv.conf
 # Docker သို့ ပြောင်းလဲမှု သက်ရောက်စေရန် Docker Service အား Restart ချခြင်း
 sudo systemctl restart docker
 ```
-၎င်းနောက် `git pull` နှင့် `sudo docker build -t amnezia-wg-easy:2.0 .` တို့ကို ပြန်လည်လုပ်ဆောင်နိုင်ပါသည်။
+၎င်းနောက် `git pull` နှင့် `sudo docker build --network=host -t amnezia-wg-easy:2.0 .` တို့ကို ပြန်လည်လုပ်ဆောင်နိုင်ပါသည်။
 
 ### ၂။ ချိတ်ဆက်မှု မကြာခဏ ပြတ်တောက်ခြင်း (Intermittent Disconnection)
 အကယ်၍ VPN ချိတ်ဆက်ပြီးနောက် စက္ကန့် ၃၀ မှ ၆၀ အတွင်း လိုင်းပြတ်တောက်သွားခြင်း (သို့မဟုတ်) ချိတ်လိုက်ပြုတ်လိုက် ဖြစ်နေပါက အောက်ပါအချက်များကို စစ်ဆေးပါ -

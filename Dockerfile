@@ -39,7 +39,7 @@ COPY --from=build_node_modules /node_modules /node_modules
 COPY --from=build_node_modules /app/wgpw.sh /bin/wgpw
 RUN chmod +x /bin/wgpw
 
-RUN apk add --no-cache \
+RUN sed -i 's/https/http/' /etc/apk/repositories && apk add --no-cache \
     dpkg \
     dumb-init \
     iptables \
