@@ -15,6 +15,7 @@
 - **QR Code & Config Download:** Client များအတွက် ဆက်သွယ်ရန် configuration ဖိုင်နှင့် QR ကုဒ်များ တိုက်ရိုက်ထုတ်ပေးခြင်း။
 - **Traffic Stats:** One-time links, traffic usage charts နှင့် device list များ စောင့်ကြည့်နိုင်ခြင်း။
 - **3X-UI Coexistence Support:** ဆာဗာတစ်ခုတည်းပေါ်တွင် VLESS-Reality နှင့် Hysteria 2 များကိုပါ Port မငြိစွန်းဘဲ အတူတွဲဖက်လည်ပတ်နိုင်ခြင်း ([3X-UI Setup Guide](3XUI_COEXIST_GUIDE.md) တွင် ကြည့်ရှုနိုင်ပါသည်)။
+- **Outline VPN Coexistence Support:** Port 443 ကို မထိခိုက်စေဘဲ Outline (Shadowbox) ကိုပါ Port 10443/18443 ဖြင့် တွဲဖက်တပ်ဆင်ခြင်းနှင့် Docker MTU ပြဿနာများ ဖြေရှင်းခြင်း ([Outline Setup Guide](OUTLINE_COEXIST_GUIDE.md) တွင် ကြည့်ရှုနိုင်ပါသည်)။
 
 ---
 
