@@ -334,6 +334,66 @@ sudo apt install -y docker.io git
 sudo systemctl enable --now docker
 ```
 
+### ၄။ Web UI ပွင့်သော်လည်း VPN Key ချိတ်မရခြင်း / Handshake မတက်ခြင်း (Domain DNS Blocking & UDP Port Issues)
+Web UI စာမျက်နှာကို ပုံမှန်အတိုင်း ဝင်ရောက်နိုင်သော်လည်း၊ ဖုန်းထဲတွင် VPN ချိတ်ဆက်သည့်အခါ `latest handshake` မပေါ်ဘဲ အင်တာနက်မထွက်ခြင်း ဖြစ်ပေါ်ပါက အောက်ပါအချက်များကြောင့် ဖြစ်ပါသည် -
+
+* **Domain DNS Blocking / Poisoning:** ပြည်တွင်း မိုဘိုင်းဖုန်းလိုင်းများ (MPT, Atom, Ooredoo စသည်) သည် `.top`, `.xyz` စသည့် Domain များကို DNS Block / Poisoning ပြုလုပ်ထားတတ်သည်။ ထို့ကြောင့် ဖုန်းက Endpoint ဒိုမိန်းကို IP ရှာမတွေ့ဘဲ ဆာဗာသို့ packet လုံးဝမပို့နိုင်တော့ပါ။
+* **Cloud Provider UDP Firewall ပိတ်ထားခြင်း:** VPS Provider ၏ Dashboard (Security Group / Firewall) တွင် `udp` protocol ကို ဖွင့်မပေးထားခြင်း။
+* **High UDP Port ပိတ်ဆို့ခံရခြင်း:** မူလ `58210/udp` ကဲ့သို့သော port များကို မိုဘိုင်းဖုန်းလိုင်းများက ပိတ်ထားတတ်ခြင်း။
+
+**ဖြေရှင်းနည်း အဆင့်ဆင့် -**
+
+၁။ **Cloud Dashboard တွင် UDP Rule ဖွင့်ပေးခြင်း:**
+VPS ဝယ်ယူထားသော Cloud Provider (ဥပမာ- QQG.NET, Oracle, AWS) ၏ Security Group ထဲတွင် `Protocol: udp`၊ `Port range: 1-65535` (သို့မဟုတ် `443`)၊ `Authorized IP: 0.0.0.0/0` ကို Inbound Rule အဖြစ် ထည့်သွင်းပေးပါ။
+
+၂။ **Direct IP နှင့် UDP 443 ဖြင့် Container ကို စတင်လည်ပတ်စေခြင်း:**
+Domain အစား ဆာဗာ၏ Direct IP ကို အသုံးပြုခြင်းဖြင့် DNS ပိတ်ဆို့မှုအားလုံးကို ကျော်ဖြတ်နိုင်သလို၊ VPN Port ကို `UDP 443` (QUIC Web Traffic) အဖြစ် အသုံးပြုလိုက်ပါက မည်သည့်ဖုန်းလိုင်းမှ လုံးဝပိတ်ဆို့ခွင့် မရှိတော့ပါ (Web UI က TCP 443 ကို သုံးပြီး၊ VPN က UDP 443 ကို သုံးသောကြောင့် တစ်ခုနှင့်တစ်ခု မငြိစွန်းပါ) -
+
+```bash
+# NAT Module နှင့် IP Forwarding ဖွင့်ခြင်း
+sudo modprobe iptable_nat
+echo "iptable_nat" | sudo tee /etc/modules-load.d/iptable_nat.conf
+sudo sysctl -w net.ipv4.ip_forward=1
+
+# Firewall တွင် UDP 443 ကို ဖွင့်ခြင်း
+sudo ufw allow 443/udp
+sudo ufw reload
+
+# ဆာဗာ၏ Direct Public IP ဖြင့် Container အသစ် စတင်ခြင်း
+SERVER_IP=$(curl -s -4 ifconfig.me)
+HASH=$(sudo docker inspect amnezia-wg-easy --format='{{range .Config.Env}}{{println .}}{{end}}' | grep '^PASSWORD_HASH=' | cut -d= -f2)
+VOL_DIR="/home/zinko/.amnezia-wg-easy"
+[ ! -d "$VOL_DIR" ] && VOL_DIR="/root/.amnezia-wg-easy"
+
+sudo docker stop amnezia-wg-easy
+sudo docker rm amnezia-wg-easy
+
+sudo docker run -d \
+  --name=amnezia-wg-easy \
+  -e WG_HOST="$SERVER_IP" \
+  -e PASSWORD_HASH="$HASH" \
+  -e PORT=51831 \
+  -e WG_PORT=443 \
+  -e WG_MTU=1200 \
+  -e WG_PERSISTENT_KEEPALIVE=25 \
+  -e UI_ENABLE_SORT_CLIENTS=true \
+  -e UI_TRAFFIC_STATS=true \
+  -e WG_ENABLE_EXPIRES_TIME=true \
+  -e WG_ENABLE_ONE_TIME_LINKS=true \
+  -v "$VOL_DIR:/etc/wireguard" \
+  -p 443:443/udp \
+  -p 127.0.0.1:51831:51831/tcp \
+  --cap-add=NET_ADMIN \
+  --cap-add=SYS_MODULE \
+  --sysctl="net.ipv4.conf.all.src_valid_mark=1" \
+  --sysctl="net.ipv4.ip_forward=1" \
+  --device=/dev/net/tun:/dev/net/tun \
+  --restart unless-stopped \
+  amnezia-wg-easy:2.0
+```
+
+၎င်းနောက် Web UI မှ ထုတ်ပေးသမျှ QR Code များနှင့် Config ဖိုင်များသည် Direct IP ဖြင့် အလိုအလျောက် ထွက်လာမည်ဖြစ်ပြီး Scan ဖတ်ရုံဖြင့် ချက်ချင်း ချိတ်ဆက်မိသွားမည် ဖြစ်သည်။
+
 ---
 
 ## 📊 ဆာဗာ၏ အင်တာနက် အဝင်အထွက် စစ်ဆေးခြင်း (Server Network Monitoring & Speed Test)
